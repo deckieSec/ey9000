@@ -2,50 +2,76 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>EY9000 Meme Hub</title>
+  <title>EY9000 Meme Grid</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
-    body { 
-      background: #0d0d0d; 
-      color: #fff; 
-      font-family: Arial, sans-serif; 
-      margin: 0; 
+    body {
+      background: #0d0d0d;
+      color: #fff;
+      font-family: Arial, sans-serif;
+      margin: 0;
     }
-    h1 { 
-      text-align: center; 
-      margin-top: 30px; 
+    h1 {
+      text-align: center;
+      margin-top: 30px;
       font-size: 42px;
+      letter-spacing: 2px;
     }
     .grid {
       padding: 20px;
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
       gap: 20px;
     }
     .grid img {
       width: 100%;
       border-radius: 10px;
       border: 2px solid #333;
+      background: #111;
+      object-fit: contain;
     }
     footer {
       text-align: center;
       padding: 20px;
       color: #777;
+      margin-top: 40px;
     }
   </style>
 </head>
+
 <body>
 
-  <h1>EY9000 MEME GRID</h1>
+<h1>EY9000 MEME GRID</h1>
+<div class="grid" id="memeGrid"></div>
 
-  <div class="grid">
-    <img src="images/meme1.jpg">
-    <img src="images/meme2.jpg">
-    <img src="images/meme3.jpg">
-    <img src="images/meme4.jpg">
-  </div>
+<footer>© EY9000 · Meme Hub</footer>
 
-  <footer>© EY9000 · Meme Hub</footer>
+<script>
+(async () => {
+  const folder = "images/";
+  const grid = document.getElementById("memeGrid");
+
+  // GitHub Pages does not allow directory listing,
+  // BUT we can fetch the GitHub API to list files automatically.
+  const apiUrl = "https://api.github.com/repos/deckieSec/ey9000/contents/images";
+
+  // Fetch list of files from GitHub
+  const res = await fetch(apiUrl);
+  const files = await res.json();
+
+  // Filter image files
+  const images = files.filter(f => 
+    f.name.match(/\.(jpg|jpeg|png|webp|gif)$/i)
+  );
+
+  // Generate grid
+  images.forEach(img => {
+    const el = document.createElement("img");
+    el.src = folder + img.name;
+    grid.appendChild(el);
+  });
+})();
+</script>
 
 </body>
 </html>

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>EY9000 MEME FEED</title>
+  <title>EY9000 MEME SLIDESHOW</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <style>
@@ -12,91 +12,102 @@
       font-family: Arial, sans-serif;
       margin: 0;
       padding: 0;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
     }
 
     h1 {
       text-align: center;
-      padding: 20px 0;
-      font-size: 32px;
-      margin-bottom: 10px;
+      padding: 16px 8px;
+      font-size: 26px;
       letter-spacing: 1px;
     }
 
-    .feed {
+    .wrap {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 8px;
+    }
+
+    .frame {
       width: 100%;
       max-width: 700px;
-      margin: 0 auto;
-      padding: 20px;
-      padding-bottom: 80px;
-    }
-
-    .meme {
-      width: 100%;
-      margin-bottom: 25px;
       border-radius: 12px;
-      overflow: hidden;
-      background: #111;
       border: 2px solid #222;
-      box-shadow: 0 0 10px #0008;
+      background: #111;
+      overflow: hidden;
+      box-shadow: 0 0 18px #000a;
     }
 
-    .meme img {
+    .frame img {
       width: 100%;
       display: block;
     }
 
     footer {
       text-align: center;
-      padding: 20px;
+      padding: 12px;
       color: #777;
-      font-size: 14px;
+      font-size: 13px;
     }
   </style>
 </head>
 
 <body>
 
-  <h1>EY9000 MEME FEED</h1>
+  <h1>EY9000 MEME SLIDESHOW</h1>
 
-  <div class="feed" id="memeFeed"></div>
+  <div class="wrap">
+    <div class="frame">
+      <img id="memeImage" src="" alt="meme">
+    </div>
+  </div>
 
-  <footer>© EY9000 · Meme Hub</footer>
+  <footer>Drop new images into <code>/images</code> · They auto-join the loop</footer>
 
   <script>
     (async () => {
       const folder = "images/";
-      const feed = document.getElementById("memeFeed");
+      const imgEl = document.getElementById("memeImage");
 
-      // GitHub API to list your /images files
+      // GitHub API listing for /images in this repo
       const apiUrl = "https://api.github.com/repos/deckieSec/ey9000/contents/images";
 
       try {
         const res = await fetch(apiUrl);
         const files = await res.json();
 
-        // Filter image files
+        // image files only
         let images = files.filter(f =>
           f.name.match(/\.(jpg|jpeg|png|webp|gif)$/i)
         );
 
-        // Randomize order each refresh
+        if (!images.length) {
+          imgEl.alt = "No memes found in /images";
+          return;
+        }
+
+        // random order
         images = images.sort(() => Math.random() - 0.5);
 
-        // Add each meme to the feed
-        images.forEach(img => {
-          const box = document.createElement("div");
-          box.className = "meme";
+        let i = 0;
 
-          const image = document.createElement("img");
-          image.src = folder + img.name;
+        function showNext() {
+          imgEl.src = folder + images[i].name;
+          i = (i + 1) % images.length;
+        }
 
-          box.appendChild(image);
-          feed.appendChild(box);
-        });
+        // show first image immediately
+        showNext();
 
+        // change every 5 seconds (adjust if you want)
+        setInterval(showNext, 5000);
       } catch (e) {
-        console.error("Error loading memes:", e);
-        feed.innerHTML = "<p style='text-align:center;color:#f44'>Error loading memes.</p>";
+        console.error(e);
+        imgEl.alt = "Error loading memes.";
       }
     })();
   </script>
